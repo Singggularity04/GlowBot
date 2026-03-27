@@ -29,6 +29,6 @@ async def handle_quick_reply(message: Message) -> None:
     # Fallback — guide user to the menu
     await message.answer(
         "Я пока не понял запрос 🤔\n"
-        "Попробуй выбрать нужный раздел из меню 👇",
+        "Попробуйте выбрать нужный раздел из меню 👇",
         reply_markup=main_menu_kb(),
     )
