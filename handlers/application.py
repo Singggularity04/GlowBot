@@ -56,6 +56,18 @@ async def start_application(callback: CallbackQuery, state: FSMContext) -> None:
     )
 
 
+@router.callback_query(F.data.startswith("quiz_apply_"))
+async def start_application_with_tariff(callback: CallbackQuery, state: FSMContext) -> None:
+    """Begin application with pre-selected tariff from quiz recommendation."""
+    tariff = callback.data.replace("quiz_apply_", "")
+    await state.set_state(ApplicationForm.name)
+    await state.update_data(tariff=tariff)
+    await callback.answer()
+    await callback.message.edit_text(
+        APP_STEP_NAME, reply_markup=cancel_application_kb()
+    )
+
+
 # --- Cancel ---
 
 @router.callback_query(F.data == "cancel_application")
@@ -102,12 +114,10 @@ async def process_niche(callback: CallbackQuery, state: FSMContext) -> None:
 
 @router.message(ApplicationForm.niche_custom)
 async def process_niche_custom(message: Message, state: FSMContext) -> None:
-    """Save free-text niche, go straight to contact — tariff already chosen."""
+    """Save free-text niche, continue to bot task selection."""
     await state.update_data(niche=message.text)
-    await state.set_state(ApplicationForm.contact)
-    await message.answer(
-        APP_STEP_CONTACT, reply_markup=cancel_application_kb()
-    )
+    await state.set_state(ApplicationForm.bot_task)
+    await message.answer(APP_STEP_TASK, reply_markup=task_kb())
 
 
 # --- Step 3: Bot task (inline buttons) ---

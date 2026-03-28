@@ -132,10 +132,10 @@ async def _show_quiz_result(callback: CallbackQuery, state: FSMContext) -> None:
     await asyncio.sleep(1.5)
 
     # Build personalized recommendation
-    result_text, _tariff = build_quiz_result(
+    result_text, tariff = build_quiz_result(
         has_crm=data.get("has_crm", False),
         goal=data.get("goal", "grow"),
         detail=data.get("detail"),
     )
 
-    await callback.message.edit_text(result_text, reply_markup=quiz_result_kb())
+    await callback.message.edit_text(result_text, reply_markup=quiz_result_kb(tariff))

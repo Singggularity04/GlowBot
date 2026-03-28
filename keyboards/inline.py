@@ -92,10 +92,10 @@ def quiz_manual_kb() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def quiz_result_kb() -> InlineKeyboardMarkup:
-    """After quiz recommendation — apply or view all tariffs."""
+def quiz_result_kb(tariff: str) -> InlineKeyboardMarkup:
+    """After quiz recommendation — apply with pre-selected tariff or view all."""
     builder = InlineKeyboardBuilder()
-    builder.button(text="✅ Выбрать этот тариф", callback_data="start_application")
+    builder.button(text="✅ Выбрать этот тариф", callback_data=f"quiz_apply_{tariff}")
     builder.button(text="💰 Посмотреть все тарифы", callback_data="tariffs")
     builder.adjust(1)
     return builder.as_markup()
