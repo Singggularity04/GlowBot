@@ -102,10 +102,12 @@ async def process_niche(callback: CallbackQuery, state: FSMContext) -> None:
 
 @router.message(ApplicationForm.niche_custom)
 async def process_niche_custom(message: Message, state: FSMContext) -> None:
-    """Save free-text niche, continue to bot task selection."""
+    """Save free-text niche, go straight to contact — tariff already chosen."""
     await state.update_data(niche=message.text)
-    await state.set_state(ApplicationForm.bot_task)
-    await message.answer(APP_STEP_TASK, reply_markup=task_kb())
+    await state.set_state(ApplicationForm.contact)
+    await message.answer(
+        APP_STEP_CONTACT, reply_markup=cancel_application_kb()
+    )
 
 
 # --- Step 3: Bot task (inline buttons) ---
