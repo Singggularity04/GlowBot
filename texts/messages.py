@@ -253,41 +253,117 @@ QUICK_REPLIES = {
     ),
 }
 
-# --- Tariff Picker ---
+# --- Tariff Quiz (multi-step picker) ---
 
-PICK_TARIFF_INTRO = (
-    "🎯 <b>Подберём подходящий тариф!</b>\n\n"
-    "Ответьте на пару вопросов, и я подскажу "
-    "лучший вариант для вас."
+QUIZ_INTRO = "Давайте быстро подберём подходящий вариант 👇"
+
+QUIZ_Q1_CRM = (
+    "Подскажите 👇\n\n"
+    "У Вас уже есть система записи?"
 )
 
-PICK_TARIFF_Q1 = (
-    "Что для вас сейчас важнее всего?\n\n"
-    "1️⃣ Автоматизировать запись клиентов\n"
-    "2️⃣ Увеличить количество записей\n"
-    "3️⃣ Полная система под ключ"
+QUIZ_Q2_GOAL = "Что для Вас сейчас важнее всего?"
+
+# Q3 variants — shown depending on Q2 answer
+QUIZ_Q3_LOSE_CLIENTS = (
+    "Сейчас клиенты иногда теряются\n"
+    "или не доходят до записи?"
 )
 
-PICK_TARIFF_RESULTS = {
-    "pick_1": (
-        "💎 Вам подойдёт <b>START</b> — 2 999 ₽\n\n"
-        "Автоматическая запись клиентов, ответы на вопросы, "
-        "работа 24/7 вместо вас.\n"
-        "Отличный вариант для старта."
-    ),
-    "pick_2": (
-        "🔥 Рекомендуем <b>GROW</b> — 4 999 ₽\n\n"
-        "Доводит клиента до записи, убирает переписки, "
-        "увеличивает поток клиентов.\n"
-        "Его выбирают чаще всего."
-    ),
-    "pick_3": (
-        "💰 Вам подойдёт <b>PRO</b> — 8 999 ₽\n\n"
-        "Полная система под ключ: запись, привлечение клиентов, "
-        "помощь с запуском и поддержка 7 дней.\n"
-        "Для тех, кто хочет максимум результата."
-    ),
+QUIZ_Q3_MANUAL = "Сейчас Вы отвечаете клиентам вручную?"
+
+QUIZ_THINKING = "Подбираю для Вас лучший вариант 👇"
+
+QUIZ_UPSELL = (
+    "❗ Чаще всего выбирают именно этот вариант,\n"
+    "потому что он быстрее окупается"
+)
+
+# --- Tariff descriptions used in quiz results ---
+_TARIFF_INFO = {
+    "START": {
+        "emoji": "💎",
+        "price": "2 999 ₽",
+        "benefits": (
+            "— автоматизировать запись клиентов\n"
+            "— отвечать на частые вопросы 24/7\n"
+            "— убрать ручные переписки"
+        ),
+    },
+    "GROW": {
+        "emoji": "🔥",
+        "price": "4 999 ₽",
+        "benefits": (
+            "— довести клиента до записи\n"
+            "— убрать лишние переписки\n"
+            "— увеличить количество клиентов"
+        ),
+    },
+    "PRO": {
+        "emoji": "💰",
+        "price": "8 999 ₽",
+        "benefits": (
+            "— получить полную систему под ключ\n"
+            "— привлекать новых клиентов\n"
+            "— получить поддержку и помощь с запуском"
+        ),
+    },
 }
+
+
+def build_quiz_result(has_crm: bool, goal: str, detail: str | None) -> tuple[str, str]:
+    """Build a personalized tariff recommendation based on quiz answers.
+
+    Returns (message_text, tariff_name) tuple.
+    """
+    # Determine recommended tariff
+    if goal == "turnkey":
+        tariff = "PRO"
+    elif not has_crm and goal == "automate":
+        tariff = "START"
+    else:
+        # has_crm + automate, or any + grow → GROW
+        tariff = "GROW"
+
+    info = _TARIFF_INFO[tariff]
+
+    # Build situation summary from user answers
+    crm_line = "— у Вас есть система записи" if has_crm else "— у Вас пока нет системы записи"
+
+    goal_lines = {
+        "automate": "— Вы хотите автоматизировать запись",
+        "grow": "— Вы хотите увеличить количество клиентов",
+        "turnkey": "— Вы хотите получить готовое решение под ключ",
+    }
+    goal_line = goal_lines.get(goal, "")
+
+    detail_line = ""
+    if detail:
+        detail_map = {
+            "yes": "— часть клиентов теряется по пути",
+            "sometimes": "— иногда клиенты не доходят до записи",
+            "no_lose": "",
+            "manual_yes": "— сейчас отвечаете клиентам вручную",
+            "manual_partial": "— часть работы с клиентами ведётся вручную",
+            "manual_no": "",
+        }
+        detail_line = detail_map.get(detail, "")
+
+    # Assemble the situation block
+    situation_parts = [p for p in [crm_line, goal_line, detail_line] if p]
+    situation = "\n".join(situation_parts)
+
+    text = (
+        f"Судя по Вашим ответам 👇\n\n"
+        f"{situation}\n\n"
+        f"Вам лучше всего подойдёт:\n"
+        f"{info['emoji']} <b>{tariff}</b> — {info['price']}\n\n"
+        f"Он поможет:\n"
+        f"{info['benefits']}\n\n"
+        f"{QUIZ_UPSELL}"
+    )
+
+    return text, tariff
 
 # --- Contact ---
 

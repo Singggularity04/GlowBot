@@ -44,24 +44,60 @@ def tariff_actions_kb() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def pick_tariff_kb() -> InlineKeyboardMarkup:
-    """Tariff picker — 3 options matching new tariff structure."""
+def quiz_start_kb() -> InlineKeyboardMarkup:
+    """Quiz intro — single 'Start' button."""
     builder = InlineKeyboardBuilder()
-    builder.button(text="1️⃣ Автоматизировать запись", callback_data="pick_1")
-    builder.button(text="2️⃣ Увеличить записи", callback_data="pick_2")
-    builder.button(text="3️⃣ Система под ключ", callback_data="pick_3")
+    builder.button(text="▶️ Начать", callback_data="quiz_start")
     builder.button(text="🔙 Назад в меню", callback_data="menu")
     builder.adjust(1)
     return builder.as_markup()
 
 
-def pick_result_kb() -> InlineKeyboardMarkup:
-    """After tariff recommendation — apply or back."""
+def quiz_crm_kb() -> InlineKeyboardMarkup:
+    """Q1 — does the user have a booking system?"""
     builder = InlineKeyboardBuilder()
-    builder.button(text="📝 Оставить заявку", callback_data="start_application")
-    builder.button(text="💰 Все тарифы", callback_data="tariffs")
-    builder.button(text="🔙 Назад в меню", callback_data="menu")
-    builder.adjust(2, 1)
+    builder.button(text="✅ Да", callback_data="quiz_crm_yes")
+    builder.button(text="❌ Нет", callback_data="quiz_crm_no")
+    builder.adjust(2)
+    return builder.as_markup()
+
+
+def quiz_goal_kb() -> InlineKeyboardMarkup:
+    """Q2 — what is the user's main goal?"""
+    builder = InlineKeyboardBuilder()
+    builder.button(text="📅 Автоматизировать запись", callback_data="quiz_goal_automate")
+    builder.button(text="📈 Увеличить количество клиентов", callback_data="quiz_goal_grow")
+    builder.button(text="🔧 Сделать всё под ключ", callback_data="quiz_goal_turnkey")
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def quiz_lose_clients_kb() -> InlineKeyboardMarkup:
+    """Q3 variant — do clients get lost before booking?"""
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Да, есть такое", callback_data="quiz_detail_yes")
+    builder.button(text="Иногда", callback_data="quiz_detail_sometimes")
+    builder.button(text="Нет", callback_data="quiz_detail_no_lose")
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def quiz_manual_kb() -> InlineKeyboardMarkup:
+    """Q3 variant — does the user reply to clients manually?"""
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Да", callback_data="quiz_detail_manual_yes")
+    builder.button(text="Частично", callback_data="quiz_detail_manual_partial")
+    builder.button(text="Нет", callback_data="quiz_detail_manual_no")
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def quiz_result_kb() -> InlineKeyboardMarkup:
+    """After quiz recommendation — apply or view all tariffs."""
+    builder = InlineKeyboardBuilder()
+    builder.button(text="✅ Выбрать этот тариф", callback_data="start_application")
+    builder.button(text="💰 Посмотреть все тарифы", callback_data="tariffs")
+    builder.adjust(1)
     return builder.as_markup()
 
 
