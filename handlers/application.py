@@ -17,6 +17,7 @@ from keyboards.inline import (
 from texts.messages import (
     APP_STEP_NAME,
     APP_STEP_NICHE,
+    APP_STEP_NICHE_CUSTOM,
     APP_STEP_TASK,
     APP_STEP_TARIFF,
     APP_STEP_DESCRIPTION,
@@ -33,9 +34,10 @@ router = Router()
 
 
 class ApplicationForm(StatesGroup):
-    """FSM states for the 6-step application flow."""
+    """FSM states for the application flow."""
     name = State()
     niche = State()
+    niche_custom = State()  # free-text input when user picks "Другое"
     bot_task = State()
     tariff = State()
     description = State()
@@ -81,12 +83,29 @@ async def process_name(message: Message, state: FSMContext) -> None:
 
 @router.callback_query(ApplicationForm.niche, F.data.startswith("niche_"))
 async def process_niche(callback: CallbackQuery, state: FSMContext) -> None:
-    """Save niche selection, ask for bot tasks."""
+    """Save niche selection or ask for custom input if 'Другое'."""
     niche = callback.data.replace("niche_", "")
+    await callback.answer()
+
+    if niche == "Другое":
+        # Ask user to type their niche manually
+        await state.set_state(ApplicationForm.niche_custom)
+        await callback.message.edit_text(
+            APP_STEP_NICHE_CUSTOM, reply_markup=cancel_application_kb()
+        )
+        return
+
     await state.update_data(niche=niche)
     await state.set_state(ApplicationForm.bot_task)
-    await callback.answer()
     await callback.message.edit_text(APP_STEP_TASK, reply_markup=task_kb())
+
+
+@router.message(ApplicationForm.niche_custom)
+async def process_niche_custom(message: Message, state: FSMContext) -> None:
+    """Save free-text niche, continue to bot task selection."""
+    await state.update_data(niche=message.text)
+    await state.set_state(ApplicationForm.bot_task)
+    await message.answer(APP_STEP_TASK, reply_markup=task_kb())
 
 
 # --- Step 3: Bot task (inline buttons) ---
