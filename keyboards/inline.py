@@ -45,11 +45,11 @@ def tariff_actions_kb() -> InlineKeyboardMarkup:
 
 
 def pick_tariff_kb() -> InlineKeyboardMarkup:
-    """Tariff picker — 3 complexity levels."""
+    """Tariff picker — 3 options matching new tariff structure."""
     builder = InlineKeyboardBuilder()
-    builder.button(text="1️⃣ Одну-две задачи", callback_data="pick_1")
-    builder.button(text="2️⃣ Несколько задач", callback_data="pick_2")
-    builder.button(text="3️⃣ Много задач", callback_data="pick_3")
+    builder.button(text="1️⃣ Автоматизировать запись", callback_data="pick_1")
+    builder.button(text="2️⃣ Увеличить записи", callback_data="pick_2")
+    builder.button(text="3️⃣ Система под ключ", callback_data="pick_3")
     builder.button(text="🔙 Назад в меню", callback_data="menu")
     builder.adjust(1)
     return builder.as_markup()
@@ -136,9 +136,9 @@ def task_kb() -> InlineKeyboardMarkup:
 def tariff_select_kb() -> InlineKeyboardMarkup:
     """Tariff selection for application step 4."""
     builder = InlineKeyboardBuilder()
-    builder.button(text="📦 Базовый", callback_data="app_tariff_Базовый")
-    builder.button(text="⭐ Стандарт", callback_data="app_tariff_Стандарт")
-    builder.button(text="🚀 PRO", callback_data="app_tariff_PRO")
+    builder.button(text="💎 START", callback_data="app_tariff_START")
+    builder.button(text="🔥 GROW", callback_data="app_tariff_GROW")
+    builder.button(text="💰 PRO", callback_data="app_tariff_PRO")
     builder.button(text="🤔 Нужна помощь с выбором", callback_data="app_tariff_Нужна помощь с выбором")
     builder.adjust(3, 1)
     return builder.as_markup()
